@@ -103,5 +103,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
+
 == Upgrade Notice ==
 First release
