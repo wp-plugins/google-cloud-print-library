@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print
 Requires at least: 3.1
 Tested up to: 3.6
-Stable tag: 0.1.4
+Stable tag: 0.1.5
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT
 
@@ -72,8 +72,10 @@ Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.
 
 == Changelog ==
 
-= 0.1.4 2013/05/10 =
+= 0.1.5 29/July/2013 =
+* FIX: display saved printer preference on options page
 
+= 0.1.4 10/May/2013 =
 * First version
 
 == License ==
@@ -103,6 +105,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
-
 == Upgrade Notice ==
-First release
+Fixed bug whereby the saved printer was not being shown on the options page

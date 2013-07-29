@@ -4,14 +4,15 @@ Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/extend/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: DavidAnderson
-Version: 0.1.4
+Version: 0.1.5
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
+Donate: http://david.dw-perspective.org.uk/donate
 */
 
 if (!defined ('ABSPATH')) die ('No direct access allowed');
 
-define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.1.4');
+define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.1.5');
 
 define('GOOGLECLOUDPRINTLIBRARY_SLUG', 'google-cloud-print-library');
 define('GOOGLECLOUDPRINTLIBRARY_DIR', dirname(__FILE__));
@@ -130,7 +131,7 @@ class GoogleCloudPrintLibrary_GCPL {
 
 	function google_cloud_print_library_options_password() {
 		$options = get_option('google_cloud_print_library_options');
-		echo '<input id="google_cloud_print_library_options_password" name="google_cloud_print_library_options[password]" size="40" type="password" value="" />';
+		echo '<input id="google_cloud_print_library_options_password" name="google_cloud_print_library_options[password]" size="40" type="password" value="" /><br><em>N.B. Your password is not stored - it is used once to gain an authentication token, which is stored instead.</em>';
 	}
 
 	function google_cloud_print_library_options_header() {
@@ -157,7 +158,7 @@ class GoogleCloudPrintLibrary_GCPL {
 			echo '<select id="google_cloud_print_library_options_printer" name="google_cloud_print_library_options[printer]">';
 
 			foreach ($printers as $printer) {
-				echo '<option value="'.htmlspecialchars($printer->id).'">'.htmlspecialchars($printer->displayName).'</option>';
+				echo '<option '.((isset($options['printer']) && $options['printer'] == $printer->id) ? 'selected="selected"' : '').'value="'.htmlspecialchars($printer->id).'">'.htmlspecialchars($printer->displayName).'</option>';
 			}
 
 			echo '</select>';
