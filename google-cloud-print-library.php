@@ -68,11 +68,12 @@ class GoogleCloudPrintLibrary_GCPL {
 
 	}
 
-	public function print_document($printer_id = false, $title, $text, $prepend = false, $copies = 1) {
+	public function print_document($printer_id = false, $title, $text, $prepend = false, $copies = false) {
 
 		$options = get_option('google_cloud_print_library_options');
 		$token = $options['password'];
 
+		if (false === $copies) $copies = $options['copies'];
 		$copies = max(intval($copies), 1);
 
 		if ($printer_id == false || empty($token)) {
