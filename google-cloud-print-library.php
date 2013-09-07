@@ -4,7 +4,7 @@ Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/extend/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: DavidAnderson
-Version: 0.1.5
+Version: 0.1.6
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
 Donate: http://david.dw-perspective.org.uk/donate
@@ -12,7 +12,7 @@ Donate: http://david.dw-perspective.org.uk/donate
 
 if (!defined ('ABSPATH')) die ('No direct access allowed');
 
-define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.1.5');
+define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.1.6');
 
 define('GOOGLECLOUDPRINTLIBRARY_SLUG', 'google-cloud-print-library');
 define('GOOGLECLOUDPRINTLIBRARY_DIR', dirname(__FILE__));
@@ -41,6 +41,7 @@ class GoogleCloudPrintLibrary_GCPL {
 		add_settings_field ( 'google_cloud_print_library_options_username', 'Google Username', array($this, 'google_cloud_print_library_options_username'), 'google_cloud_print_library' , 'google_cloud_print_library_options' );
 		add_settings_field ( 'google_cloud_print_library_options_password', 'Password (if altering)', array($this, 'google_cloud_print_library_options_password'), 'google_cloud_print_library' , 'google_cloud_print_library_options' );
 		add_settings_field ( 'google_cloud_print_library_options_printer', 'Printer', array($this, 'google_cloud_print_library_options_printer'), 'google_cloud_print_library' , 'google_cloud_print_library_options' );
+		add_settings_field ( 'google_cloud_print_library_options_copies', 'Copies', array($this, 'google_cloud_print_library_options_copies'), 'google_cloud_print_library' , 'google_cloud_print_library_options' );
 		add_settings_field ( 'google_cloud_print_library_options_header', 'Print job header', array($this, 'google_cloud_print_library_options_header'), 'google_cloud_print_library' , 'google_cloud_print_library_options' );
 
 	}
@@ -49,7 +50,7 @@ class GoogleCloudPrintLibrary_GCPL {
 
 		if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'gcpl-nonce') || empty($_POST['printer']) || empty($_POST['printtext'])) die;
 
-		$printed = $this->print_document($_POST['printer'], 'Google Cloud Print Test', '<p>'.nl2br($_POST['printtext']).'</p>', $_POST['prependtext']);
+		$printed = $this->print_document($_POST['printer'], 'Google Cloud Print Test', '<p>'.nl2br($_POST['printtext']).'</p>', $_POST['prependtext'], (int)$_POST['copies']);
 
 		if (isset($printed->success) && $printed->success == true) {
 			echo 'ok';
@@ -67,10 +68,12 @@ class GoogleCloudPrintLibrary_GCPL {
 
 	}
 
-	public function print_document($printer_id = false, $title, $text, $prepend = false) {
+	public function print_document($printer_id = false, $title, $text, $prepend = false, $copies = 1) {
 
 		$options = get_option('google_cloud_print_library_options');
 		$token = $options['password'];
+
+		$copies = max(intval($copies), 1);
 
 		if ($printer_id == false || empty($token)) {
 			$printer_id = $options['printer'];
@@ -99,6 +102,14 @@ class GoogleCloudPrintLibrary_GCPL {
 		# Save to file
 		// file_put_contents('sample.pdf', $dompdf->output());
 
+		/*
+		# Get capabilities of printer
+		$u = "https://www.google.com/cloudprint/printer?printerid=".urlencode($printer_id)."&output=json";
+		$a= array('printerid' => $printer_id);
+		$r = $this->process_request($u, $p, $token);
+		error_log(serialize($r));
+		*/
+
 		$url = "https://www.google.com/cloudprint/submit?printerid=".urlencode($printer_id)."&output=json";
 
 		$post = array(
@@ -109,9 +120,10 @@ class GoogleCloudPrintLibrary_GCPL {
 			"content" => 'data:application/pdf;base64,'. base64_encode($dompdf->output())
 		);
 
-		$ret = $this->process_request($url, $post, $token);
-
-		if (is_string($ret)) return json_decode($ret);
+		for ($i=1; $i<=$copies; $i++) {
+			$ret = $this->process_request($url, $post, $token);
+			if ($i == $copies && is_string($ret)) return json_decode($ret);
+		}
 
 		$x = new stdClass;
 		$x->success = false;
@@ -138,6 +150,12 @@ class GoogleCloudPrintLibrary_GCPL {
 		$options = get_option('google_cloud_print_library_options');
 		echo '<textarea id="google_cloud_print_library_options_header" name="google_cloud_print_library_options[header]" rows="10" cols="60" />'.htmlspecialchars($options['header']).'</textarea><br>';
 		echo '<em>Anything you enter here will be pre-pended to the print job. Use any valid HTML (including &lt;style&gt; tags)</em>';
+	}
+
+	function google_cloud_print_library_options_copies() {
+		$options = get_option('google_cloud_print_library_options');
+		$copies = max(intval($options['copies']), 1);
+		echo '<input id="google_cloud_print_library_options_copies" name="google_cloud_print_library_options[copies]" size="2" type="text" value="'.$copies.'" maxlength="3" /><br>';
 	}
 
 	// This function is both an options field printer, and called via AJAX
@@ -207,6 +225,9 @@ class GoogleCloudPrintLibrary_GCPL {
 
 			// Reset
 			delete_transient('google_cloud_print_library_printers');
+
+			$input['copies'] = max(intval($input['copies']), 1);
+
 
 			// Authenticate
 			$authed = $this->authorize(
@@ -332,7 +353,7 @@ class GoogleCloudPrintLibrary_GCPL {
 			wp_die( __('You do not have sufficient permissions to access this page.') );
 		}
 
-		wp_enqueue_script('jquery');
+		wp_enqueue_script('jquery-ui-spinner', false, array('jquery'));
 
 		$pver = GOOGLECLOUDPRINTLIBRARY_VERSION;
 
@@ -390,6 +411,8 @@ ENDHERE;
 	<script>
 		jQuery(document).ready(function() {
 
+			jQuery('#google_cloud_print_library_options_copies').spinner({ numberFormat: "n" });
+
 			jQuery('#gcpl_refreshprinters').click(function() {
 				jQuery('#google_cloud_print_library_options_printer').css('opacity','0.3');
 				jQuery('#gcpl_refreshprinters').html('(refreshing...)');
@@ -416,6 +439,7 @@ ENDHERE;
 						action: 'gcpl_test_print',
 						printtext: whatprint,
 						printer: whichprint,
+						copies: jQuery('#google_cloud_print_library_options_copies').val(),
 						prependtext: jQuery('#google_cloud_print_library_options_header').val(),
 						_wpnonce: '$nonce'
 					}, function(response) {

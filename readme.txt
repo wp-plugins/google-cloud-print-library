@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print
 Requires at least: 3.1
 Tested up to: 3.6
-Stable tag: 0.1.5
+Stable tag: 0.1.6
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT
 
@@ -71,6 +71,9 @@ None from me. I will accept useful patches that make this plugin more useful for
 Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.com), my profile page (http://profiles.wordpress.org/DavidAnderson), and for command-line users, WordShell (http://wordshell.net).
 
 == Changelog ==
+
+= 0.1.6 07/Sep/2013 =
+* FEATURE: Allow printing of multiple copies (compatible with all printers - job is sent multiple times)
 
 = 0.1.5 29/July/2013 =
 * FIX: display saved printer preference on options page
