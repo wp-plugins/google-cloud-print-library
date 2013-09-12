@@ -2,7 +2,7 @@
 Contributors: DavidAnderson
 Tags: google cloud print
 Requires at least: 3.1
-Tested up to: 3.6
+Tested up to: 3.6.1
 Stable tag: 0.1.6
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT
