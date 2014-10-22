@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
 Tested up to: 4.0
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT
 
@@ -74,7 +74,7 @@ Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.
 
 == Changelog ==
 
-= 0.2.0 22/Oct/2014 =
+= 0.2.1 22/Oct/2014 =
 * TWEAK: Code re-factored and brought up to date with best practices. Also now uses wp_remote_post() instead of Curl directly.
 * FEATURE: Internationalised (i.e. ready for translation)
 
@@ -115,4 +115,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
 == Upgrade Notice ==
-0.2.0: Code reorganisation and modernisation. Remains compatible with previous releases.
+0.2.1: Code reorganisation and modernisation. Remains compatible with previous releases.
