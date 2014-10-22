@@ -7,9 +7,9 @@ Author: DavidAnderson
 Version: 0.2.0
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
-Donate: http://david.dw-perspective.org.uk/donate
 Text Domain: google-cloud-print-library
 Domain Path: /languages
+Donate: http://david.dw-perspective.org.uk/donate
 */
 
 // TODO: (Is this true?) Find out why we always get BadAuth the first time
