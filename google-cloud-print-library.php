@@ -16,18 +16,14 @@ Domain Path: /languages
 
 if (!defined('ABSPATH')) die ('No direct access allowed');
 
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.2.0');
-
-define('GOOGLECLOUDPRINTLIBRARY_SLUG', 'google-cloud-print-library');
 define('GOOGLECLOUDPRINTLIBRARY_DIR', dirname(realpath(__FILE__)));
-
 if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPRINTLIBRARY_DIR.'/class-gcpl.php');
 
 # Setting this global variable is legacy - there's no reason why there needs to be a global. But, it is used by existing versions of the WooCommerce Print Orders plugin. GoogleCloudPrintLibrary_GCPL_v2 and GoogleCloudPrintLibrary_GCPL are compatible - but we invoke GoogleCloudPrintLibrary_GCPL_v2 specifically here, to prefer our version if it is available (as it will be newer).
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
-$googlecloudprintlibrary_plugin = new GoogleCloudPrintLibrary_Plugin($googlecloudprintlibrary_gcpl);
-
+if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.2.0');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
@@ -54,7 +50,7 @@ class GoogleCloudPrintLibrary_Plugin {
 	}
 
 	public function load_translations() {
-		load_plugin_textdomain('google-cloud-print-library', false, GOOGLECLOUDPRINTLIBRARY_DIR.'/languages/');
+		load_plugin_textdomain('google-cloud-print-library', false, dirname(__FILE__).'/languages/');
 	}
 
 	public function google_cloud_print_options($options) {
@@ -212,7 +208,8 @@ class GoogleCloudPrintLibrary_Plugin {
 	}
 
 	public function action_links($links, $file) {
-		if ( $file == GOOGLECLOUDPRINTLIBRARY_SLUG."/".GOOGLECLOUDPRINTLIBRARY_SLUG.".php" ){
+		$us = basename(dirname(__FILE__)).'/'.basename(__FILE__);
+		if ( $file == $us ){
 			array_unshift( $links, 
 				'<a href="options-general.php?page=google_cloud_print_library">'.__('Settings').'</a>',
 				'<a href="http://updraftplus.com">'.__('UpdraftPlus WordPress backups', 'google-cloud-print-library').'</a>'
@@ -348,5 +345,8 @@ ENDHERE;
 ENDHERE;
 
 	}
-
 }
+endif;
+
+if (!isset($googlecloudprintlibrary_plugin) || !is_a($googlecloudprintlibrary_plugin, 'GoogleCloudPrintLibrary_Plugin'))
+$googlecloudprintlibrary_plugin = new GoogleCloudPrintLibrary_Plugin($googlecloudprintlibrary_gcpl);
