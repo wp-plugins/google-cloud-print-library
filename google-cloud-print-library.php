@@ -27,6 +27,9 @@ define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.2.0');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
+
+	public $title = 'Google Cloud Print Library';
+
 	private $gcpl;
 	private $printers_found = 0;
 
