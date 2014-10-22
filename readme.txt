@@ -19,7 +19,7 @@ If you find it useful in your project, then please do consider a donation: http:
 
 Here's some example code:
 
-`// Ensure that we've got the Google Cloud Print Library Object
+`// Ensure that we can get a Google Cloud Print Library object
 
 if (class_exists('GoogleCloudPrintLibrary_GCPL_v2')) {
 
