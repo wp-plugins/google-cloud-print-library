@@ -1,6 +1,6 @@
 === Google Cloud Print Library ===
 Contributors: DavidAnderson
-Tags: google cloud print
+Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
 Tested up to: 4.0
 Stable tag: 0.2.0
