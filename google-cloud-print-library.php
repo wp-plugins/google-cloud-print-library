@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Google Cloud Print Library
-Plugin URI: http://wordpress.org/extend/plugins/google-cloud-print-library
+Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: DavidAnderson
 Version: 0.2.0
@@ -228,13 +228,17 @@ class GoogleCloudPrintLibrary_Plugin {
 
 		$pver = GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION;
 
+		$title = htmlspecialchars($this->title);
+
 		echo <<<ENDHERE
 	<div style="clear: left;width:950px; float: left; margin-right:20px;">
 
-		<h1>Google Cloud Print Library (version $pver)</h1>
+		<h1>$title (version $pver)</h1>
 ENDHERE;
 
-		echo '<p>Authored by <strong>David Anderson</strong> (<a href="http://david.dw-perspective.org.uk">Homepage</a> | <a href="http://updraftplus.com">UpdraftPlus - Best WordPress Backup</a> | <a href="http://wordpress.org/plugins/google-cloud-print-library">'.__('Instructions', 'google-cloud-print-library').'</a>)</p>';
+		echo '<p>Authored by <strong>David Anderson</strong> (<a href="http://david.dw-perspective.org.uk">Homepage</a> | <a href="http://updraftplus.com">UpdraftPlus - Best WordPress Backup</a> | <a href="https://www.simbahosting.co.uk/s3/shop/">Other WordPress / WooCommerce plugins</a>)</p>';
+
+		#  | <a href="http://wordpress.org/plugins/google-cloud-print-library">'.__('Instructions', 'google-cloud-print-library').'</a>)
 
 		echo "<div>\n";
 
