@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print
 Requires at least: 3.2
 Tested up to: 4.0
-Stable tag: 0.1.6
+Stable tag: 0.2.0
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT
 
@@ -20,12 +20,14 @@ If you find it useful in your project, then please do consider a donation: http:
 Here's some example code:
 
 `// Ensure that we've got the Google Cloud Print Library Object
-global $googlecloudprintlibrary_gcpl;
-if (isset($googlecloudprintlibrary_gcpl) && is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) {
+
+if (class_exists('GoogleCloudPrintLibrary_GCPL_v2')) {
 
 	// The first parameter to print_document() is the printer ID. Use false to send to the default. You can use the get_printers() method to get a list of those available.
 
-	$printed = $googlecloudprintlibrary_gcpl->print_document(false, get_bloginfo('name').' - test print', '<b>My HTML to print</b>');
+	$gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
+
+	$printed = $gcpl->print_document(false, get_bloginfo('name').' - test print', '<b>My HTML to print</b>');
 
 	// Parse the results
 	if (!isset($printed->success)) {
@@ -72,6 +74,10 @@ Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.
 
 == Changelog ==
 
+= 0.2.0 22/Oct/2014 =
+* TWEAK: Code re-factored and brought up to date with best practices. Also now uses wp_remote_post() instead of Curl directly.
+* FEATURE: Internationalised (i.e. ready for translation)
+
 = 0.1.6 07/Sep/2013 =
 * FEATURE: Allow printing of multiple copies (compatible with all printers - job is sent multiple times)
 
@@ -109,4 +115,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
 == Upgrade Notice ==
-Fixed bug whereby the saved printer was not being shown on the options page
+0.2.0: Code reorganisation and modernisation. Remains compatible with previous releases.
