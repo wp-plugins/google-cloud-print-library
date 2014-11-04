@@ -207,6 +207,12 @@ class GoogleCloudPrintLibrary_Plugin {
 	}
 
 	public function options_header() {
+		echo __('Google Cloud Print links:', 'google-cloud-print-library').' ';
+		echo '<a href="https://www.google.com/cloudprint/learn/">'.__('Learn about Google Cloud Print', 'google-cloud-print-library').'</a>';
+		echo ' | ';
+		echo '<a href="https://www.google.com/cloudprint/#printers">'.__('Your printers', 'google-cloud-print-library').'</a>';
+		echo ' | ';
+		echo '<a href="https://www.google.com/cloudprint/#jobs">'.__('Your print jobs', 'google-cloud-print-library').'</a>';
 	}
 
 	public function admin_menu() {
