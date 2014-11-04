@@ -4,7 +4,7 @@ Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: DavidAnderson
-Version: 0.2.1
+Version: 0.3.0
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
 Text Domain: google-cloud-print-library
@@ -23,19 +23,23 @@ if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPR
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
 if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.2.1');
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.3.0');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
 
 	public $title = 'Google Cloud Print Library';
 
+	private $option_page = 'google_cloud_print_library';
+
 	private $gcpl;
 	private $printers_found = 0;
 
-	public function __construct($gcpl) {
+	public function __construct($gcpl, $option_page = 'google_cloud_print_library') {
+
 		$this->version = GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION;
 		$this->gcpl = $gcpl;
+		$this->option_page = $option_page;
 
 		// Stuff specific to the setup of this plugin
 		add_action('plugins_loaded', array($this, 'load_translations'));
@@ -44,8 +48,8 @@ class GoogleCloudPrintLibrary_Plugin {
 		add_filter('plugin_action_links', array($this, 'action_links'), 10, 2 );
 
 		// AJAX actions for our settings page
-		add_action('wp_ajax_gcpl_test_print', array($this, 'test_print'));
-		add_action('wp_ajax_gcpl_refresh_printers', array($this, 'google_cloud_print_library_options_printer'));
+		add_action('wp_ajax_gcpl_test_print_'.$this->option_page, array($this, 'test_print'));
+		add_action('wp_ajax_gcpl_refresh_printers_'.$this->option_page, array($this, 'google_cloud_print_library_options_printer'));
 
 		// Provide default values from this plugin's settings
 		add_filter('google_cloud_print_copies', array($this, 'google_cloud_print_copies'));
@@ -207,14 +211,14 @@ class GoogleCloudPrintLibrary_Plugin {
 
 	public function admin_menu() {
 		# http://codex.wordpress.org/Function_Reference/add_options_page
-		add_options_page('Google Cloud Print', 'Google Cloud Print', 'manage_options', 'google_cloud_print_library', array($this, 'options_printpage'));
+		add_options_page('Google Cloud Print', 'Google Cloud Print', 'manage_options', $this->option_page, array($this, 'options_printpage'));
 	}
 
 	public function action_links($links, $file) {
 		$us = basename(dirname(__FILE__)).'/'.basename(__FILE__);
 		if ( $file == $us ){
 			array_unshift( $links, 
-				'<a href="options-general.php?page=google_cloud_print_library">'.__('Settings').'</a>',
+				'<a href="options-general.php?page='.$this->option_page.'">'.__('Settings').'</a>',
 				'<a href="http://updraftplus.com">'.__('UpdraftPlus WordPress backups', 'google-cloud-print-library').'</a>'
 			);
 		}
@@ -278,6 +282,9 @@ ENDHERE;
 		$refreshing = esc_js(__('refreshing...', 'google-cloud-print-library'));
 		$refresh = esc_js(__('refresh', 'google-cloud-print-library'));
 		$print = esc_js(__('Print', 'google-cloud-print-library'));
+
+		$option_page = $this->option_page;
+
 		echo <<<ENDHERE
 			</tr>
 
@@ -301,7 +308,7 @@ ENDHERE;
 				jQuery('#google_cloud_print_library_options_printer').css('opacity','0.3');
 				jQuery('#gcpl_refreshprinters').html('($refreshing)');
 				jQuery.post(ajaxurl, {
-					action: 'gcpl_refresh_printers',
+					action: 'gcpl_refresh_printers_${option_page}',
 					_wpnonce: '$nonce'
 				}, function(response) {
 					jQuery('#google_cloud_print_library_options_printer').replaceWith(response);
@@ -320,7 +327,7 @@ ENDHERE;
 				if (whichprint) {
 					jQuery('#gcpl-testprint').html('$printing');
 					jQuery.post(ajaxurl, {
-						action: 'gcpl_test_print',
+						action: 'gcpl_test_print_${option_page}',
 						printtext: whatprint,
 						printer: whichprint,
 						copies: jQuery('#google_cloud_print_library_options_copies').val(),

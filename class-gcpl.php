@@ -1,9 +1,9 @@
 <?php
 
-if (!defined('ABSPATH')) die ('No direct access allowed');
+if (!defined('ABSPATH')) die('No direct access allowed');
 
 if (!class_exists('GoogleCloudPrintLibrary_GCPL')):
-define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.2.1');
+define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.3.0');
 class GoogleCloudPrintLibrary_GCPL {
 
 	public $version;
@@ -40,31 +40,6 @@ class GoogleCloudPrintLibrary_GCPL {
 			}
 		}
 
-		# http://code.google.com/p/dompdf/wiki/Usage#Usage
-
-		if (!class_exists('DOMPDF')) require_once(dirname(__FILE__)."/dompdf/dompdf_config.inc.php");
-
-		if ($prepend === false) $prepend = $options['header'];
-
-		$html =
-		'<html><body>'.$prepend.$document.'</body></html>';
-
-		try {
-			$dompdf = new DOMPDF();
-			if (!defined('WP_DEBUG') || !WP_DEBUG) $dompdf->set_option('log_output_file', false);
-			$dompdf->load_html($html);
-			$dompdf->render();
-			# Send to browser
-			// $dompdf->stream("sample.pdf");
-			# Save to file
-			// file_put_contents('sample.pdf', $dompdf->output());
-		} catch (Exception $e) {
-			$x = new stdClass;
-			$x->success = false;
-			$x->message = 'DOMPDF error ('.get_class($e).', '.$e->getCode().'): '.$e->getMessage().' (line: '.$e->getLine().', file: '.$e->getFile().')';
-			return $x;
-		}
-
 		/*
 		# Get capabilities of printer
 		$u = "https://www.google.com/cloudprint/printer?printerid=".urlencode($printer_id)."&output=json";
@@ -73,6 +48,42 @@ class GoogleCloudPrintLibrary_GCPL {
 		error_log(serialize($r));
 		*/
 
+		# http://code.google.com/p/dompdf/wiki/Usage#Usage
+
+		if ($prepend === false) $prepend = $options['header'];
+
+		if (is_string($document)) {
+
+			if (!class_exists('DOMPDF')) require_once(apply_filters('google_cloud_print_dompdf_loader', dirname(__FILE__)."/dompdf/dompdf_config.inc.php"));
+
+			if (false === stripos($prepend, '<html>') && false === stripos($document, '<html>')) {
+				$html = '<html><body>'.$prepend.$document.'</body></html>';
+			} else {
+				$html = $prepend.$document;
+			}
+
+			try {
+				$dompdf = new DOMPDF();
+				if (!defined('WP_DEBUG') || !WP_DEBUG) $dompdf->set_option('log_output_file', false);
+				$dompdf->load_html($html);
+				$dompdf->render();
+				# Send to browser
+				// $dompdf->stream("sample.pdf");
+				# Save to file
+				// file_put_contents('sample.pdf', $dompdf->output());
+				$pdf_output = $dompdf->output();
+			} catch (Exception $e) {
+				$x = new stdClass;
+				$x->success = false;
+				$x->message = 'DOMPDF error ('.get_class($e).', '.$e->getCode().'): '.$e->getMessage().' (line: '.$e->getLine().', file: '.$e->getFile().')';
+				return $x;
+			}
+		} elseif (is_array($document) && !empty($document['pdf-raw'])) {
+			$pdf_output = $document['pdf-raw'];
+		} elseif (is_array($document) && !empty($document['pdf-file'])) {
+			$pdf_output = file_get_contents($document['pdf-file']);
+		}
+
 		$url = "https://www.google.com/cloudprint/submit?printerid=".urlencode($printer_id)."&output=json";
 
 		$post = array(
@@ -80,7 +91,7 @@ class GoogleCloudPrintLibrary_GCPL {
 			"capabilities" => "",
 			"contentType" => "dataUrl",
 			"title" => $title,
-			"content" => 'data:application/pdf;base64,'. base64_encode($dompdf->output())
+			"content" => 'data:application/pdf;base64,'. base64_encode($pdf_output)
 		);
 
 		for ($i=1; $i<=$copies; $i++) {
