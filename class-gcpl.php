@@ -180,7 +180,8 @@ class GoogleCloudPrintLibrary_GCPL {
 				),
 				'sslverify' => true,
 				'redirection' => 5,
-				'body' => $post_fields
+				'body' => $post_fields,
+				'timeout' => 15
 			)
 		);
 
