@@ -3,7 +3,7 @@
 Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
-Author: DavidAnderson
+Author: David Anderson
 Version: 0.3.1
 License: MIT
 Author URI: http://david.dw-perspective.org.uk

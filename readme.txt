@@ -11,7 +11,7 @@ License: MIT/GPLv2+
 
 This plugin is mainly for programmers to use. It contains an options page to set up a connection to a Google account, and allows you to choose a Google Cloud Print printer from your account and to test printing to it.
 
-The main use of this plugin is for developers of other plugins to deploy, and integrate with their plugins. For example, I have developed a plugin that can send orders (invoices, delivery and packing notes) from a WooCommerce web shop automatically to Google Cloud Print.
+The main use of this plugin is for developers of other plugins to deploy, and integrate with their plugins. For example, it has been integrated into <a title="WooCommerce - automatically print orders, invoices and delivery notes" href="https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/">this plugin that can send orders (invoices, delivery and packing notes) from a WooCommerce web shop automatically to Google Cloud Print</a>.
 
 If you find it useful in your project, then please do consider a donation: http://david.dw-perspective.org.uk/donate
 
@@ -54,7 +54,7 @@ Standard WordPress plugin installation:
 
 = What does this plugin do? =
 
-It is a developers' plugin. It provides code to get you connected quickly and easily to Google Cloud Print. A developer can harness it rapidly from within his own plugin to despatch print jobs to a Google Cloud Print-connected printer.
+It is a developers' plugin. It provides code to get you connected quickly and easily to Google Cloud Print. A developer can harness it rapidly from within his own plugin to despatch print jobs to a Google Cloud Print-connected printer. For example, its underlying engine is deployed in this plugin for printing automatically WooCommerce orders (great for restaurants, take-aways or anyone who always wants to print a packing slip and wants to save time): https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/
 
 = How do I, as a developer, use it? =
 
