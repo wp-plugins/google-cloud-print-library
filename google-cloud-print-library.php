@@ -12,8 +12,6 @@ Domain Path: /languages
 Donate: http://david.dw-perspective.org.uk/donate
 */
 
-// TODO: (Is this true?) Find out why we always get BadAuth the first time
-
 if (!defined('ABSPATH')) die ('No direct access allowed');
 
 define('GOOGLECLOUDPRINTLIBRARY_DIR', dirname(realpath(__FILE__)));
@@ -23,7 +21,7 @@ if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPR
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
 if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.3.0');
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.3.1');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
@@ -34,6 +32,7 @@ class GoogleCloudPrintLibrary_Plugin {
 
 	private $gcpl;
 	private $printers_found = 0;
+	private $token;
 
 	public function __construct($gcpl, $option_page = 'google_cloud_print_library') {
 
@@ -164,13 +163,12 @@ class GoogleCloudPrintLibrary_Plugin {
 
 	public function options_validate($input) {
 
-		if (current_user_can('manage_options') && !empty($input['username']) && !empty($input['password'])) {
+		if (current_user_can('manage_options') && empty($this->token) && !empty($input['username']) && !empty($input['password'])) {
 
 			// Reset
 			delete_transient('google_cloud_print_library_printers');
 
 			$input['copies'] = max(intval($input['copies']), 1);
-
 
 			// Authenticate
 			$authed = $this->gcpl->authorize(
@@ -193,14 +191,20 @@ class GoogleCloudPrintLibrary_Plugin {
 					}
 				}
 			} else {
+				// For reasons unknown, recent versions of WP call through options_validate() again with the updated value, which then leads to an authorisation failure when we pass it to Google. To avoid that, we store it to detect the double-run.
+				$this->token = $authed;
 				$input['password'] = $authed;
 			}
 			
 		} else {
 			$existing_options = get_option('google_cloud_print_library_options');
 
-			// We don't actually store the password - that's not needed
-			$input['password'] = (isset($existing_options['password'])) ? $existing_options['password'] : '';
+			if (!empty($this->token)) {
+				$input['password'] = $this->token;
+			} else {
+				// We don't actually store the password - that's not needed
+				$input['password'] = (isset($existing_options['password'])) ? $existing_options['password'] : '';
+			}
 		}
 
 		return $input;
@@ -225,7 +229,7 @@ class GoogleCloudPrintLibrary_Plugin {
 		if ( $file == $us ){
 			array_unshift( $links, 
 				'<a href="options-general.php?page='.$this->option_page.'">'.__('Settings').'</a>',
-				'<a href="http://updraftplus.com">'.__('UpdraftPlus WordPress backups', 'google-cloud-print-library').'</a>'
+				'<a href="http://updraftplus.com/">'.__('UpdraftPlus WordPress backups', 'google-cloud-print-library').'</a>'
 			);
 		}
 		return $links;
@@ -310,7 +314,8 @@ ENDHERE;
 
 			jQuery('#google_cloud_print_library_options_copies').spinner({ numberFormat: "n" });
 
-			jQuery('#gcpl_refreshprinters').click(function() {
+			jQuery('#gcpl_refreshprinters').click(function(e) {
+				e.preventDefault();
 				jQuery('#google_cloud_print_library_options_printer').css('opacity','0.3');
 				jQuery('#gcpl_refreshprinters').html('($refreshing)');
 				jQuery.post(ajaxurl, {

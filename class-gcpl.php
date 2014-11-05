@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) die('No direct access allowed');
 
 if (!class_exists('GoogleCloudPrintLibrary_GCPL')):
-define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.3.0');
+define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.3.1');
 class GoogleCloudPrintLibrary_GCPL {
 
 	public $version;
