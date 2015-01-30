@@ -40,17 +40,24 @@ class GoogleCloudPrintLibrary_GCPL {
 			}
 		}
 
-		/*
 		# Get capabilities of printer
-		$u = "https://www.google.com/cloudprint/printer?printerid=".urlencode($printer_id)."&output=json";
-		$a= array('printerid' => $printer_id);
-		$r = $this->process_request($u, $p, $token);
-		error_log(serialize($r));
-		*/
+// 		$can_fit_to_page = false;
+// // 		$u = "https://www.google.com/cloudprint/printer";#?printerid=".urlencode($printer_id)."&use_cdd=true&output=json";
+// 		$p = array('use_cdd' => 'true', 'printerid' => $printer_id);
+// 		$r = $this->process_request("https://www.google.com/cloudprint/printer", $p, $token);
+// 		if (is_string($r)) {
+// 			$r = json_decode($r);
+// 			if (is_object($r) && isset($r->printers[0]->capabilities->printer->fit_to_page->option)) {
+// 				$options = $r->printers[0]->capabilities->printer->fit_to_page->option;
+// 				foreach ($options as $num => $opt) {
+// 					if (is_object($opt) && isset($opt->type) && $opt->type == 'FIT_TO_PAGE') $can_fit_to_page = $num;
+// 				}
+// 			}
+// 		}
 
 		# http://code.google.com/p/dompdf/wiki/Usage#Usage
 
-		if ($prepend === false) $prepend = $options['header'];
+		if ($prepend === false) $prepend = (isset($options['header'])) ? $options['header'] : '';
 
 		if (is_string($document)) {
 
@@ -88,11 +95,24 @@ class GoogleCloudPrintLibrary_GCPL {
 
 		$post = array(
 			"printerid" => $printer_id,
-			"capabilities" => "",
+// 			"capabilities" => "",
 			"contentType" => "dataUrl",
 			"title" => $title,
 			"content" => 'data:application/pdf;base64,'. base64_encode($pdf_output)
 		);
+
+// 		if (false !== $can_fit_to_page) {
+// 			$post['ticket'] = json_encode(array(
+// 				'version' => '1.0',
+// 				'print' => array(
+// 					'vendor_ticket_item' => array(),
+// 					'fit_to_page' => array( 'type' => $can_fit_to_page),
+// // 					'margins' => array(
+// // 						'top_microns' => 30000
+// // 					)
+// 				),
+// 			));
+// 		}
 
 		for ($i=1; $i<=$copies; $i++) {
 			$ret = $this->process_request($url, $post, $token);
@@ -196,8 +216,15 @@ class GoogleCloudPrintLibrary_GCPL {
 		}
 
 		if ($post['response']['code'] >=400 && $post['response']['code']<500) {
- 			error_log('POST error: Unexpected response (code '.$post['response']['code'].'): '.serialize($post));
-			return new WP_Error('http_badauth', "Authentication failed (".$post['response']['code']."): ".$post['body']);
+
+			$extra = '';
+
+			if (403 == $post['response']['code'] && !empty($post['body']) && false !== strpos($post['body'], 'Info=WebLoginRequired') && preg_match('/Url=(\S+)/', $post['body'], $umatch)) {
+				$extra = 'Due to recent Google API changes, you will need to <a href="https://www.google.com/settings/security/lesssecureapps">go to your Google account, and enable &quot;less secure&quot; apps</a>. (N.B. This app does not store your password after using it once, so is not actually insecure). Or, <a href="https://www.google.com/landing/2step/">enable two-factor authentication on your Google account</a> and then <a href="http://support.google.com/accounts/bin/answer.py?hl=en&answer=185833">obtain an application-specific password</a>.';
+			}
+
+//  			error_log('POST error: Unexpected response (code '.$post['response']['code'].'): '.serialize($post));
+			return new WP_Error('http_badauth', $extra."Authentication failed (".$post['response']['code']."): ".$post['body']);
 		}
 
 		if ($post['response']['code'] >=400) {
