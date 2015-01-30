@@ -2,16 +2,16 @@
 Contributors: DavidAnderson
 Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
-Tested up to: 4.0
-Stable tag: 0.2.0
+Tested up to: 4.1
+Stable tag: 0.3.2
 Donate link: http://david.dw-perspective.org.uk/donate
-License: MIT
+License: MIT/GPLv2+
 
 == Description ==
 
 This plugin is mainly for programmers to use. It contains an options page to set up a connection to a Google account, and allows you to choose a Google Cloud Print printer from your account and to test printing to it.
 
-The main use of this plugin is for developers of other plugins to deploy, and integrate with their plugins. For example, I have developed a plugin that can send orders from a web shop automatically to Google Cloud Print.
+The main use of this plugin is for developers of other plugins to deploy, and integrate with their plugins. For example, it has been integrated into <a title="WooCommerce - automatically print orders, invoices and delivery notes" href="https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/">this plugin that can send orders (invoices, delivery and packing notes) from a WooCommerce web shop automatically to Google Cloud Print</a>.
 
 If you find it useful in your project, then please do consider a donation: http://david.dw-perspective.org.uk/donate
 
@@ -54,7 +54,7 @@ Standard WordPress plugin installation:
 
 = What does this plugin do? =
 
-It is a developers' plugin. It provides code to get you connected quickly and easily to Google Cloud Print. A developer can harness it rapidly from within his own plugin to despatch print jobs to a Google Cloud Print-connected printer.
+It is a developers' plugin. It provides code to get you connected quickly and easily to Google Cloud Print. A developer can harness it rapidly from within his own plugin to despatch print jobs to a Google Cloud Print-connected printer. For example, its underlying engine is deployed in this plugin for printing automatically WooCommerce orders (great for restaurants, take-aways or anyone who always wants to print a packing slip and wants to save time): https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/
 
 = How do I, as a developer, use it? =
 
@@ -74,17 +74,31 @@ Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.
 
 == Changelog ==
 
-= 0.2.0 22/Oct/2014 =
+= 0.3.2 - 30/Jan/2015 =
+* TWEAK: Add a message with instructions for users who fall foul of Google's recent changes to the ClientLogin method
+
+= 0.3.1 - 05/Nov/2014 =
+* FIX: Fix bug that meant you had to enter your password twice (first time always failed)
+* TWEAK: Stop the page jumping when you click on the 'refresh' link for the list of printers
+
+= 0.3.0 - 04/Nov/2014 =
+* TWEAK: Update to DomPDF 0.6
+* TWEAK: Minor changes to code internals
+
+= 0.2.2 - 01/Nov/2014 =
+* TWEAK: Minor changes to code internals
+
+= 0.2.1 - 22/Oct/2014 =
 * TWEAK: Code re-factored and brought up to date with best practices. Also now uses wp_remote_post() instead of Curl directly.
 * FEATURE: Internationalised (i.e. ready for translation)
 
-= 0.1.6 07/Sep/2013 =
+= 0.1.6 - 07/Sep/2013 =
 * FEATURE: Allow printing of multiple copies (compatible with all printers - job is sent multiple times)
 
-= 0.1.5 29/July/2013 =
+= 0.1.5 - 29/July/2013 =
 * FIX: display saved printer preference on options page
 
-= 0.1.4 10/May/2013 =
+= 0.1.4 - 10/May/2013 =
 * First version
 
 == License ==
@@ -115,4 +129,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
 == Upgrade Notice ==
-0.2.0: Code reorganisation and modernisation. Remains compatible with previous releases.
+0.3.2: Added a message with instructions for users who fall foul of Google's recent changes to the ClientLogin method.

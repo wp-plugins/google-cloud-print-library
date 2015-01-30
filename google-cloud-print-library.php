@@ -3,16 +3,14 @@
 Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
-Author: DavidAnderson
-Version: 0.2.0
+Author: David Anderson
+Version: 0.3.2
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
-Donate: http://david.dw-perspective.org.uk/donate
 Text Domain: google-cloud-print-library
 Domain Path: /languages
+Donate: http://david.dw-perspective.org.uk/donate
 */
-
-// TODO: (Is this true?) Find out why we always get BadAuth the first time
 
 if (!defined('ABSPATH')) die ('No direct access allowed');
 
@@ -23,19 +21,24 @@ if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPR
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
 if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.2.0');
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.3.1');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
 
 	public $title = 'Google Cloud Print Library';
 
+	private $option_page = 'google_cloud_print_library';
+
 	private $gcpl;
 	private $printers_found = 0;
+	private $token;
 
-	public function __construct($gcpl) {
+	public function __construct($gcpl, $option_page = 'google_cloud_print_library') {
+
 		$this->version = GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION;
 		$this->gcpl = $gcpl;
+		$this->option_page = $option_page;
 
 		// Stuff specific to the setup of this plugin
 		add_action('plugins_loaded', array($this, 'load_translations'));
@@ -44,8 +47,8 @@ class GoogleCloudPrintLibrary_Plugin {
 		add_filter('plugin_action_links', array($this, 'action_links'), 10, 2 );
 
 		// AJAX actions for our settings page
-		add_action('wp_ajax_gcpl_test_print', array($this, 'test_print'));
-		add_action('wp_ajax_gcpl_refresh_printers', array($this, 'google_cloud_print_library_options_printer'));
+		add_action('wp_ajax_gcpl_test_print_'.$this->option_page, array($this, 'test_print'));
+		add_action('wp_ajax_gcpl_refresh_printers_'.$this->option_page, array($this, 'google_cloud_print_library_options_printer'));
 
 		// Provide default values from this plugin's settings
 		add_filter('google_cloud_print_copies', array($this, 'google_cloud_print_copies'));
@@ -160,13 +163,12 @@ class GoogleCloudPrintLibrary_Plugin {
 
 	public function options_validate($input) {
 
-		if (current_user_can('manage_options') && !empty($input['username']) && !empty($input['password'])) {
+		if (current_user_can('manage_options') && empty($this->token) && !empty($input['username']) && !empty($input['password'])) {
 
 			// Reset
 			delete_transient('google_cloud_print_library_printers');
 
 			$input['copies'] = max(intval($input['copies']), 1);
-
 
 			// Authenticate
 			$authed = $this->gcpl->authorize(
@@ -189,33 +191,45 @@ class GoogleCloudPrintLibrary_Plugin {
 					}
 				}
 			} else {
+				// For reasons unknown, recent versions of WP call through options_validate() again with the updated value, which then leads to an authorisation failure when we pass it to Google. To avoid that, we store it to detect the double-run.
+				$this->token = $authed;
 				$input['password'] = $authed;
 			}
 			
 		} else {
 			$existing_options = get_option('google_cloud_print_library_options');
 
-			// We don't actually store the password - that's not needed
-			$input['password'] = (isset($existing_options['password'])) ? $existing_options['password'] : '';
+			if (!empty($this->token)) {
+				$input['password'] = $this->token;
+			} else {
+				// We don't actually store the password - that's not needed
+				$input['password'] = (isset($existing_options['password'])) ? $existing_options['password'] : '';
+			}
 		}
 
 		return $input;
 	}
 
 	public function options_header() {
+		echo __('Google Cloud Print links:', 'google-cloud-print-library').' ';
+		echo '<a href="https://www.google.com/cloudprint/learn/">'.__('Learn about Google Cloud Print', 'google-cloud-print-library').'</a>';
+		echo ' | ';
+		echo '<a href="https://www.google.com/cloudprint/#printers">'.__('Your printers', 'google-cloud-print-library').'</a>';
+		echo ' | ';
+		echo '<a href="https://www.google.com/cloudprint/#jobs">'.__('Your print jobs', 'google-cloud-print-library').'</a>';
 	}
 
 	public function admin_menu() {
 		# http://codex.wordpress.org/Function_Reference/add_options_page
-		add_options_page('Google Cloud Print', 'Google Cloud Print', 'manage_options', 'google_cloud_print_library', array($this, 'options_printpage'));
+		add_options_page('Google Cloud Print', 'Google Cloud Print', 'manage_options', $this->option_page, array($this, 'options_printpage'));
 	}
 
 	public function action_links($links, $file) {
 		$us = basename(dirname(__FILE__)).'/'.basename(__FILE__);
 		if ( $file == $us ){
 			array_unshift( $links, 
-				'<a href="options-general.php?page=google_cloud_print_library">'.__('Settings').'</a>',
-				'<a href="http://updraftplus.com">'.__('UpdraftPlus WordPress backups', 'google-cloud-print-library').'</a>'
+				'<a href="options-general.php?page='.$this->option_page.'">'.__('Settings').'</a>',
+				'<a href="http://updraftplus.com/">'.__('UpdraftPlus WordPress backups', 'google-cloud-print-library').'</a>'
 			);
 		}
 		return $links;
@@ -278,6 +292,9 @@ ENDHERE;
 		$refreshing = esc_js(__('refreshing...', 'google-cloud-print-library'));
 		$refresh = esc_js(__('refresh', 'google-cloud-print-library'));
 		$print = esc_js(__('Print', 'google-cloud-print-library'));
+
+		$option_page = $this->option_page;
+
 		echo <<<ENDHERE
 			</tr>
 
@@ -297,11 +314,12 @@ ENDHERE;
 
 			jQuery('#google_cloud_print_library_options_copies').spinner({ numberFormat: "n" });
 
-			jQuery('#gcpl_refreshprinters').click(function() {
+			jQuery('#gcpl_refreshprinters').click(function(e) {
+				e.preventDefault();
 				jQuery('#google_cloud_print_library_options_printer').css('opacity','0.3');
 				jQuery('#gcpl_refreshprinters').html('($refreshing)');
 				jQuery.post(ajaxurl, {
-					action: 'gcpl_refresh_printers',
+					action: 'gcpl_refresh_printers_${option_page}',
 					_wpnonce: '$nonce'
 				}, function(response) {
 					jQuery('#google_cloud_print_library_options_printer').replaceWith(response);
@@ -320,7 +338,7 @@ ENDHERE;
 				if (whichprint) {
 					jQuery('#gcpl-testprint').html('$printing');
 					jQuery.post(ajaxurl, {
-						action: 'gcpl_test_print',
+						action: 'gcpl_test_print_${option_page}',
 						printtext: whatprint,
 						printer: whichprint,
 						copies: jQuery('#google_cloud_print_library_options_copies').val(),
