@@ -223,7 +223,7 @@ class GoogleCloudPrintLibrary_GCPL {
 				$extra = 'Due to recent Google API changes, you will need to <a href="https://www.google.com/settings/security/lesssecureapps">go to your Google account, and enable &quot;less secure&quot; apps</a>. (N.B. This app does not store your password after using it once, so is not actually insecure). Or, <a href="https://www.google.com/landing/2step/">enable two-factor authentication on your Google account</a> and then <a href="http://support.google.com/accounts/bin/answer.py?hl=en&answer=185833">obtain an application-specific password</a>.';
 			}
 
-//  			error_log('POST error: Unexpected response (code '.$post['response']['code'].'): '.serialize($post));
+  			error_log('POST error: Unexpected response (code '.$post['response']['code'].'): '.serialize($post));
 			return new WP_Error('http_badauth', $extra."Authentication failed (".$post['response']['code']."): ".$post['body']);
 		}
 
