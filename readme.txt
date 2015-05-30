@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
 Tested up to: 4.2
-Stable tag: 0.3.2
+Stable tag: 0.4.0
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT/GPLv2+
 
@@ -12,6 +12,8 @@ License: MIT/GPLv2+
 This plugin is mainly for programmers to use. It contains an options page to set up a connection to a Google account, and allows you to choose a Google Cloud Print printer from your account and to test printing to it.
 
 The main use of this plugin is for developers of other plugins to deploy, and integrate with their plugins. For example, it has been integrated into <a title="WooCommerce - automatically print orders, invoices and delivery notes" href="https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/">this plugin that can send orders (invoices, delivery and packing notes) from a WooCommerce web shop automatically to Google Cloud Print</a>.
+
+To set up WordPress to have access to Google Cloud Print, you will need to follow this reasonably-simple tutorial: https://www.simbahosting.co.uk/s3/support/configuring-google-drive-api-access-for-cloud-print/
 
 If you find it useful in your project, then please do consider a donation: http://david.dw-perspective.org.uk/donate
 
@@ -74,6 +76,9 @@ Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.
 
 == Changelog ==
 
+= 0.4.0 - 30/May/2015 =
+* TWEAK: Now uses OAuth2 for authentication with Google (since Google have removed ClientLogin). As a result, the settings page now has entries for a client ID + secret (and a link to instructions), and the previous settings for your Google username are now gone.
+
 = 0.3.2 - 30/Jan/2015 =
 * TWEAK: Add a message with instructions for users who fall foul of Google's recent changes to the ClientLogin method
 
@@ -129,4 +134,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
 == Upgrade Notice ==
-0.3.2: Added a message with instructions for users who fall foul of Google's recent changes to the ClientLogin method.
+0.4.0: Now using OAuth2 for authentication (after Google turned off ClientLogin).
