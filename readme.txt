@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
 Tested up to: 4.2
-Stable tag: 0.4.0
+Stable tag: 0.4.1
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT/GPLv2+
 
@@ -76,6 +76,9 @@ Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.
 
 == Changelog ==
 
+= 0.4.1 - 24/Jun/2015 =
+* FEATURE: Now allows sending to multiple printers (the UI now provides check-boxes, instead of a drop-down)
+
 = 0.4.0 - 30/May/2015 =
 * TWEAK: Now uses OAuth2 for authentication with Google (since Google have removed ClientLogin). As a result, the settings page now has entries for a client ID + secret (and a link to instructions), and the previous settings for your Google username are now gone.
 
@@ -134,4 +137,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
 == Upgrade Notice ==
-0.4.0: Now using OAuth2 for authentication (after Google turned off ClientLogin).
+0.4.1: Allow printing the same job to multiple printers

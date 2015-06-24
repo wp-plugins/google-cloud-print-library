@@ -4,7 +4,7 @@ Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: David Anderson
-Version: 0.4.0
+Version: 0.4.1
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
 Text Domain: google-cloud-print-library
@@ -21,7 +21,7 @@ if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPR
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
 if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.0');
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.1');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
@@ -294,15 +294,31 @@ class GoogleCloudPrintLibrary_Plugin {
 
 		if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'gcpl-nonce') || empty($_POST['printer']) || empty($_POST['printtext'])) die;
 
-		$printed = $this->gcpl->print_document($_POST['printer'], __('Google Cloud Print Test', 'google-cloud-print-library'), '<p>'.nl2br($_POST['printtext']).'</p>', $_POST['prependtext'], (int)$_POST['copies']);
+		$printers = is_array($_POST['printer']) ? $_POST['printer'] : array($_POST['printer']);
 
-		if (isset($printed->success) && $printed->success == true) {
-			echo json_encode(array('result' => 'ok'));
-			die;
+		$success = true;
+		$message = false;
+
+		foreach ($printers as $printer) {
+
+			if (!$printer) continue;
+
+			$printed = $this->gcpl->print_document($printer, __('Google Cloud Print Test', 'google-cloud-print-library'), '<p>'.nl2br($_POST['printtext']).'</p>', $_POST['prependtext'], (int)$_POST['copies']);
+
+			if (!isset($printed->success) || !$printed->success) {
+				$success = false;
+				if (isset($printed->message)) {
+					$message = $printed->message;
+				}
+			}
+
 		}
 
-		if (isset($printed->message)) {
-			echo json_encode(array('result' => $printed->message));
+		if ($success) {
+			echo json_encode(array('result' => 'ok'));
+			die;
+		} elseif ($message) {
+			echo json_encode(array('result' => $message));
 			die;
 		}
 
@@ -361,13 +377,25 @@ class GoogleCloudPrintLibrary_Plugin {
 
 		} else {
 
-			echo '<select onchange="google_cloud_print_confirm_unload = true;" id="google_cloud_print_library_options_printer" name="google_cloud_print_library_options[printer]">';
+			// SELECT style
+// 			echo '<select onchange="google_cloud_print_confirm_unload = true;" id="google_cloud_print_library_options_printer" name="google_cloud_print_library_options[printer]">';
+// 			foreach ($printers as $printer) {
+// 				echo '<option '.((isset($options['printer']) && $options['printer'] == $printer->id) ? 'selected="selected"' : '').'value="'.htmlspecialchars($printer->id).'">'.htmlspecialchars($printer->displayName).'</option>';
+// 			}
+// 			echo '</select>';
+
+// 			echo '<select onchange="google_cloud_print_confirm_unload = true;" id="google_cloud_print_library_options_printer" name="google_cloud_print_library_options[printer]">';
+			echo '<div id="google_cloud_print_library_options_printer_container">';
+
+			// Make sure the option gets saved
+			echo '<input name="google_cloud_print_library_options[printer][]" type="hidden" value="">';
 
 			foreach ($printers as $printer) {
-				echo '<option '.((isset($options['printer']) && $options['printer'] == $printer->id) ? 'selected="selected"' : '').'value="'.htmlspecialchars($printer->id).'">'.htmlspecialchars($printer->displayName).'</option>';
+				echo '<input onchange="google_cloud_print_confirm_unload = true;" class="google_cloud_print_library_options_printer" id="google_cloud_print_library_options_printer_'.esc_attr($printer->id).'" name="google_cloud_print_library_options[printer][]" type="checkbox" '.((isset($options['printer']) && ((is_array($options['printer']) && in_array($printer->id, $options['printer'])) || (!is_array($options['printer']) && $options['printer'] == $printer->id))) ? 'checked="checked"' : '').'value="'.htmlspecialchars($printer->id).'"><label for="google_cloud_print_library_options_printer_'.esc_attr($printer->id).'">'.htmlspecialchars($printer->displayName).'</label><br>';
 			}
+// 			echo '</select>';
+			echo '</div>';
 
-			echo '</select>';
 			if (defined('DOING_AJAX') && DOING_AJAX == true) die;
 
 			echo ' <a href="#" id="gcpl_refreshprinters">('.__('refresh', 'google-cloud-print-library').')</a>';
@@ -606,26 +634,30 @@ ENDHERE;
 
 			jQuery('#gcpl_refreshprinters').click(function(e) {
 				e.preventDefault();
-				jQuery('#google_cloud_print_library_options_printer').css('opacity','0.3');
+				jQuery('.google_cloud_print_library_options_printer').css('opacity','0.3');
 				jQuery('#gcpl_refreshprinters').html('($refreshing)');
 				jQuery.post(ajaxurl, {
 					action: 'gcpl_refresh_printers_${option_page}',
 					_wpnonce: '$nonce'
 				}, function(response) {
-					jQuery('#google_cloud_print_library_options_printer').replaceWith(response);
-					jQuery('#google_cloud_print_library_options_printer').css('opacity','1');
+					jQuery('#google_cloud_print_library_options_printer_container').html(response);
+					jQuery('.google_cloud_print_library_options_printer').css('opacity','1');
 					jQuery('#gcpl_refreshprinters').html('($refresh)');
 				});
 			});
 
 			jQuery('#gcpl-testprint').click(function() {
-				var whichprint = jQuery('#google_cloud_print_library_options_printer').val();
+				var whichprint = jQuery('.google_cloud_print_library_options_printer').serialize();
+				var whichprint = [];
+				jQuery('.google_cloud_print_library_options_printer').each(function (index) {
+					if (jQuery(this).is(':checked')) { whichprint.push(jQuery(this).val()); }
+				});
 				var whatprint = jQuery('#google_cloud_print_library_testprinttext').val();
 				if (whatprint == '') {
 					alert('$youneed');
 					return;
 				}
-				if (whichprint) {
+				if (whichprint.length > 0) {
 					jQuery('#gcpl-testprint').html('$printing');
 					jQuery.post(ajaxurl, {
 						action: 'gcpl_test_print_${option_page}',
