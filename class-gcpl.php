@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) die('No direct access allowed');
 
 if (!class_exists('GoogleCloudPrintLibrary_GCPL')):
-define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.4.0');
+define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.4.2');
 class GoogleCloudPrintLibrary_GCPL {
 
 	public $version;
@@ -31,6 +31,7 @@ class GoogleCloudPrintLibrary_GCPL {
 		$token = empty($options['token']) ? '' : $options['token'];
 
 		if ($printer_id == false || empty($token)) {
+			// This could be an array
 			$printer_id = $options['printer'];
 			if (empty($printer_id)) {
 				$x = new stdClass;
@@ -91,32 +92,43 @@ class GoogleCloudPrintLibrary_GCPL {
 			$pdf_output = file_get_contents($document['pdf-file']);
 		}
 
-		$url = "https://www.google.com/cloudprint/submit?printerid=".urlencode($printer_id)."&output=json";
+		$printer_ids = is_array($printer_id) ? array_values($printer_id) : array($printer_id);
 
-		$post = array(
-			"printerid" => $printer_id,
-// 			"capabilities" => "",
-			"contentType" => "dataUrl",
-			"title" => $title,
-			"content" => 'data:application/pdf;base64,'. base64_encode($pdf_output)
-		);
+		sort($printer_ids);
 
-// 		if (false !== $can_fit_to_page) {
-// 			$post['ticket'] = json_encode(array(
-// 				'version' => '1.0',
-// 				'print' => array(
-// 					'vendor_ticket_item' => array(),
-// 					'fit_to_page' => array( 'type' => $can_fit_to_page),
-// // 					'margins' => array(
-// // 						'top_microns' => 30000
-// // 					)
-// 				),
-// 			));
-// 		}
+		foreach ($printer_ids as $k => $pid) {
 
-		for ($i=1; $i<=$copies; $i++) {
-			$ret = $this->process_request($url, $post, $options);
-			if ($i == $copies && is_string($ret)) return json_decode($ret);
+			if (!$pid) continue;
+
+			$url = "https://www.google.com/cloudprint/submit?printerid=".urlencode($pid)."&output=json";
+
+			$post = array(
+				"printerid" => $pid,
+	// 			"capabilities" => "",
+				"contentType" => "dataUrl",
+				"title" => $title,
+				"content" => 'data:application/pdf;base64,'. base64_encode($pdf_output)
+			);
+
+	/*
+			if (false !== $can_fit_to_page) {
+				$post['ticket'] = json_encode(array(
+					'version' => '1.0',
+					'print' => array(
+						'vendor_ticket_item' => array(),
+						'fit_to_page' => array( 'type' => $can_fit_to_page),
+	// 					'margins' => array(
+	// 						'top_microns' => 30000
+	// 					)
+					),
+				));
+			}
+	*/
+
+			for ($i=1; $i<=$copies; $i++) {
+				$ret = $this->process_request($url, $post, $options);
+				if ($i == $copies && is_string($ret) && $k == count($printer_ids)-1) return json_decode($ret);
+			}
 		}
 
 		$x = new stdClass;
@@ -236,7 +248,7 @@ class GoogleCloudPrintLibrary_GCPL {
 			'sslverify' => true,
 			'redirection' => 5,
 			'body' => $post_fields,
-			'timeout' => 15
+			'timeout' => 20
 		);
 
 		if (!empty($options['username']) && empty($options['clientid'])) {
