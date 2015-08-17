@@ -4,7 +4,7 @@ Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: David Anderson
-Version: 0.4.1
+Version: 0.4.2
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
 Text Domain: google-cloud-print-library
@@ -21,7 +21,7 @@ if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPR
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
 if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.1');
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.2');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
