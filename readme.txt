@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
 Tested up to: 4.3
-Stable tag: 0.4.2
+Stable tag: 0.4.3
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT/GPLv2+
 
@@ -72,9 +72,12 @@ None from me. I will accept useful patches that make this plugin more useful for
 
 = Got any other interesting tools? =
 
-Please check out the very popular UpdraftPlus backup plugin (http://updraftplus.com), my profile page (http://profiles.wordpress.org/DavidAnderson), and for command-line users, WordShell (http://wordshell.net).
+Please check out the very popular UpdraftPlus backup plugin (https://updraftplus.com), my profile page (http://profiles.wordpress.org/DavidAnderson), and for command-line users, WordShell (http://wordshell.net).
 
 == Changelog ==
+
+= 0.4.3 - 20/Aug/2015 =
+* TWEAK: Remove a CSS class from the admin notice that caused some themes to not show it.
 
 = 0.4.2 - 01/Aug/2015 =
 * Tested/compatible with WordPress 4.3
@@ -141,4 +144,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
 == Upgrade Notice ==
-0.4.2: Marked as WP 4.3 compatible
+0.4.3: Remove CSS class from admin notice that caused it to not appear with some themes

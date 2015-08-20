@@ -1,10 +1,11 @@
 <?php
+
 /*
 Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: David Anderson
-Version: 0.4.2
+Version: 0.4.3
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
 Text Domain: google-cloud-print-library
@@ -21,7 +22,7 @@ if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPR
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
 if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.2');
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.3');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
@@ -103,7 +104,7 @@ class GoogleCloudPrintLibrary_Plugin {
 	}
 
 	private function redirect_uri() {
-		return  admin_url('options-general.php').'?action=google-cloud-print-auth';
+		return admin_url('options-general.php').'?action=google-cloud-print-auth';
 	}
 
 	// Revoke a Google account refresh token
@@ -328,7 +329,7 @@ class GoogleCloudPrintLibrary_Plugin {
 	}
 
 	public function show_admin_warning($message, $class = "updated") {
-		echo '<div class="'.$class.' fade">'."<p>$message</p></div>";
+		echo '<div class="'.$class.'">'."<p>$message</p></div>";
 	}
 
 	public function google_cloud_print_library_options_clientid() {
@@ -561,18 +562,20 @@ ENDHERE;
 
 		# This is advisory - so the fact it doesn't match IPv6 addresses isn't important
 		if (preg_match('#^(https?://(\d+)\.(\d+)\.(\d+)\.(\d+))/#', $admin_page_url, $matches)) {
-			echo '<p><strong>'.htmlspecialchars(sprintf(__("%s does not allow authorisation of sites hosted on direct IP addresses. You will need to change your site's address (%s) before you can use %s for storage.", 'google-cloud-print-library'), __('Google Cloud Print', 'google-cloud-print-library'), $matches[1], __('Google Cloud Print', 'google-cloud-print-library'))).'</strong></p>';
+			echo '<p><strong>'.htmlspecialchars(sprintf(__("%s does not allow authorisation of sites hosted on direct IP addresses. You will need to change your site's address (%s) before you can use %s for storage.", 'google-cloud-print-library'), __('Google Cloud Print', 'google-cloud-print-library'), $matches[1], __('Google Cloud Print', 'google-cloud-print-library'))).'</strong></em></p>';
 		} else {
 
 			?>
 
 			<p></p>
 
-			<p><a href="https://console.developers.google.com"><?php _e('Follow this link to your Google API Console, and there create a Client ID in the API Access section.','google-cloud-print-library');?></a> <?php _e("Select 'Web Application' as the application type. Then enter the client ID and secret below and save your settings.",'google-cloud-print-library');?></p><p><?php echo htmlspecialchars(__('You must add the following as the authorised redirect URI (under "More Options") when asked','google-cloud-print-library'));?>: <kbd><?php echo $admin_page_url.'?action=google-cloud-print-auth'; ?></kbd> <?php _e('N.B. If you install this plugin on several WordPress sites, then you might have problems in re-using your project (depending on whether Google have fixed issues at their end yet); if so, then  create a new project from your Google API console for each site.','google-cloud-print-library');?>
-			</p>
+			<p><em><a href="https://console.developers.google.com"><?php _e('Follow this link to your Google API Console, and there create a Client ID in the API Access section.','google-cloud-print-library');?></a> <?php _e("Select 'Web Application' as the application type. Then enter the client ID and secret below and save your settings.",'google-cloud-print-library');?></p><p><?php echo htmlspecialchars(__('You must add the following as the authorised redirect URI (under "More Options") when asked','google-cloud-print-library'));?>: <kbd><?php echo $admin_page_url.'?action=google-cloud-print-auth'; ?></kbd> <?php _e('N.B. If you install this plugin on several WordPress sites, then you might have problems in re-using your project (depending on whether Google have fixed issues at their end yet); if so, then  create a new project from your Google API console for each site.','google-cloud-print-library');?>
+			</em></p>
 
 			<p>
-				<?php echo __('After completing authentication, a list of printers will appear.', 'google-cloud-print-library').' <strong>'.__('Choose one, and then save the settings for the second time.', 'google-cloud-print-library').'</strong></em></p>'; ?>
+				<em>
+				<?php echo __('After completing authentication, a list of printers will appear.', 'google-cloud-print-library').' <strong>'.__('Choose one, and then save the settings for the second time.', 'google-cloud-print-library').'</strong></p>'; ?>
+				</em>
 			</p>
 			<?php
 		}
