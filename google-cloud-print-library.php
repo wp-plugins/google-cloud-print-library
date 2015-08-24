@@ -1,11 +1,10 @@
 <?php
-
 /*
 Plugin Name: Google Cloud Print Library
 Plugin URI: http://wordpress.org/plugins/google-cloud-print-library
 Description: Some routines used for sending simple text files to Google Cloud Print
 Author: David Anderson
-Version: 0.4.3
+Version: 0.4.4
 License: MIT
 Author URI: http://david.dw-perspective.org.uk
 Text Domain: google-cloud-print-library
@@ -22,7 +21,7 @@ if (!class_exists('GoogleCloudPrintLibrary_GCPL_v2')) require_once(GOOGLECLOUDPR
 if (!isset($googlecloudprintlibrary_gcpl) || !is_a($googlecloudprintlibrary_gcpl, 'GoogleCloudPrintLibrary_GCPL')) $googlecloudprintlibrary_gcpl = new GoogleCloudPrintLibrary_GCPL_v2();
 
 if (!class_exists('GoogleCloudPrintLibrary_Plugin')):
-define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.3');
+define('GOOGLECLOUDPRINTLIBRARY_PLUGINVERSION', '0.4.4');
 class GoogleCloudPrintLibrary_Plugin {
 
 	public $version;
@@ -554,7 +553,7 @@ ENDHERE;
 
 		echo '<div style="margin:4px; padding:6px; border: 1px dotted;">';
 
-		echo '<p><em><strong>'.__('Instructions', 'google-cloud-print-library').':</strong> ';
+		echo '<p><em><strong>'.__('Instructions', 'google-cloud-print-library').':</strong></em></p> ';
 
 		?><a href="https://www.simbahosting.co.uk/s3/support/configuring-google-drive-api-access-for-cloud-print/"><strong><?php _e('For longer help, including screenshots, follow this link. The description below is sufficient for more expert users.', 'google-cloud-print-library');?></strong></a><?php
 
