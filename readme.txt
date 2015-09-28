@@ -3,7 +3,7 @@ Contributors: DavidAnderson
 Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
 Tested up to: 4.3
-Stable tag: 0.4.3
+Stable tag: 0.5.0
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT/GPLv2+
 
@@ -76,6 +76,9 @@ Please check out the very popular UpdraftPlus backup plugin (https://updraftplus
 
 == Changelog ==
 
+= 0.5.0 - 28/Sep/2015 =
+* TWEAK: Support the passing of more options, including paper size
+
 = 0.4.3 - 20/Aug/2015 =
 * TWEAK: Remove a CSS class from the admin notice that caused some themes to not show it.
 
@@ -144,4 +147,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The authors of the DomPDF library (http://code.google.com/p/dompdf/) are gratefully acknowledged. The DomPDF library is used under the Lesser GNU Public Licence (LGPL, version 2.1).
 
 == Upgrade Notice ==
-0.4.3: Remove CSS class from admin notice that caused it to not appear with some themes
+0.5.0 : Support the passing of more options internally

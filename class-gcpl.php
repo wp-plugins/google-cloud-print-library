@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) die('No direct access allowed');
 
 if (!class_exists('GoogleCloudPrintLibrary_GCPL')):
-define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.4.2');
+define('GOOGLECLOUDPRINTLIBRARY_VERSION', '0.5.0');
 class GoogleCloudPrintLibrary_GCPL {
 
 	public $version;
@@ -72,6 +72,16 @@ class GoogleCloudPrintLibrary_GCPL {
 
 			try {
 				$dompdf = new DOMPDF();
+
+				if (isset($options['paper_size'])) {
+					$orientation = isset($options['width']) ? $options['paper_orientation'] : 'portrait';
+					$dompdf->set_paper($options['paper_size'], $orientation);
+				} elseif (isset($options['paper_width']) && isset($options['paper_height'])) {
+					$paper_size = array(0, 0, $options['paper_width'], $options['paper_height']);
+					// The 'orientation' parametes is really just a proxy for "reverse the width/height if landscape"
+					$dompdf->set_paper($paper_size);
+				}
+
 				if (!defined('WP_DEBUG') || !WP_DEBUG) $dompdf->set_option('log_output_file', false);
 				$dompdf->load_html($html);
 				$dompdf->render();
