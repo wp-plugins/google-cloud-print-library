@@ -2,7 +2,7 @@
 Contributors: DavidAnderson
 Tags: google cloud print, woocommerce print orders, print orders
 Requires at least: 3.2
-Tested up to: 4.3
+Tested up to: 4.4
 Stable tag: 0.5.0
 Donate link: http://david.dw-perspective.org.uk/donate
 License: MIT/GPLv2+
